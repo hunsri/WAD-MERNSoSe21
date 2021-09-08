@@ -4,6 +4,8 @@ import "bootstrap/dist/css/bootstrap.min.css"
 
 import Login from "./components/Login";
 import Map from "./components/Map/Map";
+import AddAddress from "./components/AddAddress";
+import EditAddress from "./components/EditAddress";
 
 import {Layers, TileLayer, VectorLayer} from "./components/Layers";
 import {Style, Icon} from "ol/style";
@@ -15,6 +17,7 @@ import {Controls, FullScreenControl} from "./components/Controls";
 
 import mapConfig from "./components/config.json";
 import "./App.css";
+import Selection from "./components/Selection";
 
 const markersLonLat = [mapConfig.exampleLonLat];
 
@@ -58,13 +61,18 @@ function App() {
     return (
         <div>
             <nav className="navbar navbar-expand navbar-dark bg-dark">
-                <a href="/map" className="navbar-brand">
+                <a className="navbar-brand">
                     Adviz
                 </a>
                 <div className="navbar-nav mr-auto">
                     <li className="nav-item">
                         <Link to={"/map"} className="nav-link">
                             Map
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link to={"add-address"} className="nav-link">
+                            Neu
                         </Link>
                     </li>
                     <li className="nav-item">
@@ -91,9 +99,25 @@ function App() {
                         )}
                     />
                     <Route
+                        path="/add-address"
+                        render={(props) => (
+                            <AddAddress {...props} />
+                        )}
+                    />
+                    <Route
+                        path="/edit-address"
+                        render={(props) => (
+                            <EditAddress {...props} />
+                        )}
+                    />
+                    <Route
                         path="/map"
                         render={(props) => (
-                            <div>
+                            <div class="row">
+                                <div class="col-4">
+                                <Selection {...props}/>
+                                </div>
+                                <div className="col-6">
                                 <Map center={fromLonLat(center)} zoom={zoom} {...props} user={user}>
                                     <Layers>
                                         <TileLayer source={osm()} zIndex={0}/>
@@ -103,7 +127,7 @@ function App() {
                                         <FullScreenControl/>
                                     </Controls>
                                 </Map>
-                                <hr/>
+                                </div>
                                 <div>
                                     <input
                                         type="checkbox"
