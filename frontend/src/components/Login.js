@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 
+import DataService from "../services/Service"
+
 const Login = props => {
+
+    const [wrongLogin, setWrongLogin] = React.useState(false);
 
     const initialUserState = {
         name: "",
@@ -15,9 +19,26 @@ const Login = props => {
     };
 
     const login = () => {
-        //refers to the login method from the login route of App.js
-        props.login(user)
-        props.history.push('/');
+
+        let loginData = {
+            userId: user.name,
+            password: user.password
+        }
+
+        DataService.doLogin(loginData)
+            .then(response => {
+                if(response.data.access !== false)
+                {
+                    props.login(user)
+                    props.history.push("/map");
+                } else {
+                    //TODO wrong password
+                    setWrongLogin(true);
+                    //this.setState({wrongLogin: true});
+                    //props.history.push("/login");
+                }
+
+            });
     }
 
     return (
@@ -28,7 +49,7 @@ const Login = props => {
                     <input
                         type="text"
                         className="form-control"
-                        password="name"
+                        id="name"
                         required
                         value={user.name}
                         onChange={handleInputChange}
@@ -40,13 +61,16 @@ const Login = props => {
                     <label htmlFor="password">Password</label>
                     <input
                         type="text"
-                        className="form-control"
-                        password="password"
+                        className={wrongLogin ? ("form-control is-invalid") : ("form-control")}
+                        id="password"
                         required
                         value={user.password}
                         onChange={handleInputChange}
                         name="password"
                     />
+                    <div className="invalid-feedback">
+                        Keinen Eintrag mit diesen Zugangsdaten gefunden.
+                    </div>
                 </div>
 
                 <button onClick={login} className="btn btn-success">
@@ -54,7 +78,7 @@ const Login = props => {
                 </button>
             </div>
         </div>
-    );
+    )
 };
 
 export default Login;

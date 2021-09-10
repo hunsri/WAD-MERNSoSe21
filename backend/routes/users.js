@@ -3,7 +3,6 @@ var router = express.Router();
 var db = require('../db.js');
 
 router.post('/', function(req, res, next) {
-	console.log("1");
 
   db.getOneUser(req.body, function(result){
 	if (result){
@@ -11,12 +10,12 @@ router.post('/', function(req, res, next) {
 		res.status(200).set({"Content-Type":"application/json"}).json(result);
 	}
 	else
-		res.status(401).send();
+		//res.status(401).send();
+		res.status(200).set({"Content-Type":"application/json"}).json({"access": false});
   });
 });
 
 router.get('/', function(req, res, next) {
-	console.log("2");
 
   db.getAllUsers(function(result){
 	if (result){

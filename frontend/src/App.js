@@ -55,7 +55,7 @@ function App() {
     }
 
     async function logout() {
-        setUser(null)
+        setUser(null);
     }
 
     return (
@@ -65,19 +65,23 @@ function App() {
                     Adviz
                 </a>
                 <div className="navbar-nav mr-auto">
-                    <li className="nav-item">
-                        <Link to={"/map"} className="nav-link">
-                            Map
-                        </Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link to={"add-address"} className="nav-link">
-                            Neu
-                        </Link>
-                    </li>
+                    {user ? (
+                        <li className="nav-item">
+                            <Link to={"/map"} className="nav-link">
+                                Map
+                            </Link>
+                        </li>
+                    ):null}
+                    {user ? (
+                        <li className="nav-item">
+                            <Link to={"/add-address"} className="nav-link">
+                                Neu
+                            </Link>
+                        </li>
+                    ):null}
                     <li className="nav-item">
                         {user ? (
-                            <a onClick={logout} className="nav-link" style={{cursor: 'pointer'}}>
+                            <a href="/" onClick={logout} className="nav-link" style={{cursor: 'pointer'}}>
                                 Logout {user.name}
                             </a>
                         ) : (
@@ -85,7 +89,6 @@ function App() {
                                 Login
                             </Link>
                         )}
-
                     </li>
                 </div>
             </nav>
@@ -142,8 +145,7 @@ function App() {
                 </Switch>
             </div>
         </div>
-
-    );
+    )
 }
 
 export default App;
