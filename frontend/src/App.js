@@ -6,6 +6,9 @@ import Login from "./components/Login";
 import Map from "./components/Map/Map";
 import AddAddress from "./components/AddAddress";
 import EditAddress from "./components/EditAddress";
+import Selection from "./components/Selection";
+
+import DataService from "./services/Service";
 
 import {Layers, TileLayer, VectorLayer} from "./components/Layers";
 import {Style, Icon} from "ol/style";
@@ -17,7 +20,7 @@ import {Controls, FullScreenControl} from "./components/Controls";
 
 import mapConfig from "./components/config.json";
 import "./App.css";
-import Selection from "./components/Selection";
+
 
 const markersLonLat = [mapConfig.exampleLonLat];
 
@@ -39,9 +42,9 @@ function addMarkers(lonLatArray) {
     return features;
 }
 
-
 function App() {
     const [user, setUser] = React.useState(null);
+    const [allUsers, setAllUsers] = React.useState(null);
 
     const [center, setCenter] = React.useState(mapConfig.center);
     const [zoom, setZoom] = React.useState(9);
@@ -49,6 +52,19 @@ function App() {
     const [showMarker, setShowMarker] = React.useState(false);
 
     const [features, setFeatures] = React.useState(addMarkers(markersLonLat));
+
+    const [addresses, setAddresses] = React.useState([]);
+
+    function fetchAddressData(){
+        //requesting the address data from the backend
+        DataService.fetchAddresses(user, 1).then(res => {setAddresses(res)});
+    }
+
+    function fetchUsersData(){
+        if(allUsers === null)
+            //requesting the data of all users (primarily for their names)
+            DataService.fetchUsers().then(res => {setAllUsers(res)});
+    }
 
     async function login(user = null) {
         setUser(user);
@@ -60,6 +76,7 @@ function App() {
 
     return (
         <div>
+            {fetchUsersData()}
             <nav className="navbar navbar-expand navbar-dark bg-dark">
                 <a className="navbar-brand">
                     Adviz
@@ -104,21 +121,21 @@ function App() {
                     <Route
                         path="/add-address"
                         render={(props) => (
-                            <AddAddress {...props} />
+                            <AddAddress {...props} user={user} allUsers={allUsers}/>
                         )}
                     />
                     <Route
                         path="/edit-address"
                         render={(props) => (
-                            <EditAddress {...props} />
+                            <EditAddress {...props} user={user}/>
                         )}
                     />
                     <Route
                         path="/map"
                         render={(props) => (
-                            <div class="row">
-                                <div class="col-4">
-                                <Selection {...props}/>
+                            <div className="row">
+                                <div className="col-4">
+                                <Selection {...props} addresses={addresses} user={user}/>
                                 </div>
                                 <div className="col-6">
                                 <Map center={fromLonLat(center)} zoom={zoom} {...props} user={user}>
@@ -134,10 +151,13 @@ function App() {
                                 <div>
                                     <input
                                         type="checkbox"
-                                        checked={showMarker}
+                                        defaultChecked={showMarker}
                                         onChange={(event) => setShowMarker(event.target.checked)}
                                     />{" "}
                                     Show markers
+                                </div>
+                                <div>
+                                    <button onClick={(event) => {fetchAddressData(); fetchUsersData()}} type="button" className="btn btn-primary">Refresh</button>
                                 </div>
                             </div>
                         )}

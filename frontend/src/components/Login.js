@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-
-import DataService from "../services/Service"
+import DataService from "../services/Service";
 
 const Login = props => {
 
@@ -32,10 +31,7 @@ const Login = props => {
                     props.login(user)
                     props.history.push("/map");
                 } else {
-                    //TODO wrong password
                     setWrongLogin(true);
-                    //this.setState({wrongLogin: true});
-                    //props.history.push("/login");
                 }
 
             });

@@ -2,13 +2,15 @@ import React, { useState } from "react";
 
 const EditAddress = props => {
 
+    console.log(props);
+
     return (
         <div>
             <h1>Adresse verändern</h1>
             <br/>
             <label htmlFor="owner" className="form-label">Kontakt Eigentümer</label>
             <select className="custom-select m-2" id="owner">
-                <option value="1">Current User</option>
+                <option value="1">{"hei"}</option>
                 <option value="2">Other User</option>
             </select>
             <br/>
@@ -45,38 +47,38 @@ const EditAddress = props => {
             <br/>
             <br/>
             <label htmlFor="forename" className="form-label">Vorname*</label>
-            <input className="form-control" type="text" placeholder="Tim" aria-label="default input example" id="forename" required="true"/>
+            <input value={props.firstName} className="form-control" type="text" placeholder="Tim" aria-label="default input example" id="forename" required={true}/>
             <br/>
             <label htmlFor="surname" className="form-label">Nachname*</label>
-            <input className="form-control" type="text" placeholder="Berners-Lee" aria-label="default input example" id="surname" required="true"/>
+            <input className="form-control" type="text" placeholder="Berners-Lee" aria-label="default input example" id="surname" required={true}/>
             <br/>
             <div className="row">
                 <div className="col-10">
                     <label htmlFor="street" className="form-label">Straße*</label>
-                    <input className="form-control" type="text" placeholder="Via Regia" aria-label="default input example" id="street" required="true"/>
+                    <input className="form-control" type="text" placeholder="Via Regia" aria-label="default input example" id="street" required={true}/>
                 </div>
                 <div className="col-2">
                     <label htmlFor="number" className="form-label">Hausnummer*</label>
-                    <input className="form-control" type="text" placeholder="113" aria-label="default input example" id="number" required="true"/>
+                    <input className="form-control" type="text" placeholder="113" aria-label="default input example" id="number" required={true}/>
                 </div>
             </div>
             <br/>
             <div className="row">
                 <div className="col-2">
                     <label htmlFor="zipcode" className="form-label">PLZ*</label>
-                    <input className="form-control" type="text" placeholder="27367" aria-label="default input example" id="zipcode" required="true"/>
+                    <input className="form-control" type="text" placeholder="27367" aria-label="default input example" id="zipcode" required={true}/>
                 </div>
                 <div className="col-10">
                     <label htmlFor="city" className="form-label">Stadt*</label>
-                    <input className="form-control" type="text" placeholder="Stuckenborstel" aria-label="default input example" id="city" required="true"/>
+                    <input className="form-control" type="text" placeholder="Stuckenborstel" aria-label="default input example" id="city" required={true}/>
                 </div>
             </div>
             <br/>
             <label htmlFor="state" className="form-label">Bundesland*</label>
-            <input className="form-control" type="text" placeholder="Niedersachsen" aria-label="default input example" id="state" required="true"/>
+            <input className="form-control" type="text" placeholder="Niedersachsen" aria-label="default input example" id="state" required={true}/>
             <br/>
             <label htmlFor="country" className="form-label">Land*</label>
-            <input className="form-control" type="text" placeholder="Deutschland" aria-label="default input example" id="country" required="true"/>
+            <input className="form-control" type="text" placeholder="Deutschland" aria-label="default input example" id="country" required={true}/>
             <br/>
             <label htmlFor="email" className="form-label">E-Mail</label>
             <input className="form-control" type="text" placeholder="info@example.com" aria-describedby="emailHelp" id="email"/>
@@ -86,6 +88,8 @@ const EditAddress = props => {
             <br/>
             <button className="btn btn-primary btn-lg" type="submit">Senden</button>
             <a href="/map" role="button" className="btn btn-secondary btn-lg m-2">Abbrechen</a>
+            <br/>
+            <button type="button" className="btn btn-danger">Addresse löschen</button>
         </div>
     );
 }
