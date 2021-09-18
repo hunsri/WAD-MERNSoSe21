@@ -32,15 +32,13 @@ const AddAddress = props => {
 
     const [invalidAddress, setInvalidAddress] = useState(false);
 
-    function sendAddressData(data) {
-        DataService.postNewAddress(data).then();
+    async function sendAddressData(data) {
+        return DataService.postNewAddress(data);
     }
 
     async function attemptSending() {
 
         let validInput = validateInput();
-
-        console.log(validInput);
 
         if(validInput){
             DataService.fetchLonLat(addressData.street, addressData.houseNumber, addressData.postcode, addressData.country).then(res => {
@@ -49,13 +47,25 @@ const AddAddress = props => {
                     addressData.lon = res[0];
                     addressData.lat = res[1];
 
-                    sendAddressData(addressData);
+                    sendAddress();
+                    //sendAddressData(addressData);
+                    //leavePage();
                 }
             }).catch(err => {
                 //TODO catch specific errors
-                console.log(err);
                 setInvalidAddress(true);
             });
+        }
+
+        async function sendAddress() {
+            await sendAddressData(addressData);
+            leavePage();
+        }
+
+        function leavePage() {
+            if(!invalidAddress)
+                history.goBack();
+                props.refreshAddresses(1);
         }
     }
 
@@ -114,7 +124,7 @@ const AddAddress = props => {
             <h1>Neue Adresse hinzufügen</h1>
             <br/>
             <div>
-            <label htmlFor="owner" className="form-label">Kontakt Eigentümer</label>
+                <label htmlFor="owner" className="form-label">Kontakt Eigentümer</label>
                 {ownerList}
             </div>
             <br/>
@@ -205,7 +215,7 @@ const AddAddress = props => {
             <input onChange={handleInputChange} value={addressData.further} className="form-control" type="text" id="further" name="further"/>
             <br/>
             {invalidAddressWarning}
-            <button onClick={attemptSending} className="btn btn-primary btn-lg" type="submit">Senden</button>
+            <button onClick={() => {attemptSending().then()}} className="btn btn-primary btn-lg" type="submit">Senden</button>
             <button onClick={ () => history.goBack() } className="btn btn-secondary btn-lg m-2">Abbrechen</button>
         </div>
     );

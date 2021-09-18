@@ -33,10 +33,8 @@ class Service {
             http.get(url).then(res => {
 
                 if (res.data[0] !== null && res.data[0] !== undefined) {
-                    console.log("LON: " + res.data[0].lon)
                     ret = [res.data[0].lon, res.data[0].lat];
 
-                    console.log("RET: " + ret);
                     resolve(ret);
                 } else {
                     reject(ret);
@@ -47,8 +45,38 @@ class Service {
         return promise;
     }
 
-    postNewAddress(data) {
-        return http.post("/adviz/contacts", data);
+    async postNewAddress(data) {
+
+        let promise = await new Promise( function (resolve, reject) {
+            let res = http.post("/adviz/contacts", data);
+
+            if(res !== null && res !== undefined){
+                resolve(res);
+            } else {
+                reject(res);
+            }
+        });
+        return promise;
+
+        //return http.post("/adviz/contacts", data);
+    }
+
+    deleteAddress(data) {
+        return http.delete(`/adviz/contacts?firstName=${data.firstName}&lastName=${data.lastName}`);
+    }
+
+    async changeAddress(originalData, data) {
+
+        let promise = await new Promise( function (resolve, reject) {
+            let res = http.put(`/adviz/contacts?firstName=${originalData.firstName}&lastName=${originalData.lastName}`, data);
+
+            if(res !== null && res !== undefined){
+                resolve(res);
+            } else {
+                reject(res);
+            }
+        });
+        return promise;
     }
 }
 
