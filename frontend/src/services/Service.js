@@ -57,8 +57,6 @@ class Service {
             }
         });
         return promise;
-
-        //return http.post("/adviz/contacts", data);
     }
 
     deleteAddress(data) {

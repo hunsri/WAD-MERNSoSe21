@@ -3,5 +3,8 @@
   "exampleLonLat": [13.41053, 52.52437],
   "markerImage24" : "https://cdn2.iconfinder.com/data/icons/social-media-and-payment/64/-47-24.png",
   "markerImage32" : "https://cdn2.iconfinder.com/data/icons/social-media-and-payment/64/-47-32.png",
-  "markerImage64" : "https://cdn2.iconfinder.com/data/icons/social-media-and-payment/64/-47-64.png"
+  "markerImage64" : "https://cdn2.iconfinder.com/data/icons/social-media-and-payment/64/-47-64.png",
+  "targetMarkerImage24": "https://cdn2.iconfinder.com/data/icons/bitsies/128/Location-24.png",
+  "targetMarkerImage32" : "https://cdn2.iconfinder.com/data/icons/bitsies/128/Location-32.png",
+  "targetMarkerImage64" : "https://cdn2.iconfinder.com/data/icons/bitsies/128/Location-64.png"
 }

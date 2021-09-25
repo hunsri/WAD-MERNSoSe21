@@ -22,7 +22,7 @@ import "./App.css";
 
 const markersLonLat = [mapConfig.exampleLonLat];
 
-function addMarkers(lonLatArray) {
+function addMarkers(lonLatArray, targetLonLat) {
     let iconStyle = new Style({
         image: new Icon({
             anchorXUnits: "fraction",
@@ -30,14 +30,37 @@ function addMarkers(lonLatArray) {
             src: mapConfig.markerImage32,
         }),
     });
-    let features = lonLatArray.map((item) => {
-        let feature = new Feature({
-            geometry: new Point(fromLonLat(item)),
-        });
-        feature.setStyle(iconStyle);
-        return feature;
+
+    let iconTargetStyle = new Style({
+        image: new Icon({
+            anchorXUnits: "fraction",
+            anchorYUnits: "pixels",
+            src: mapConfig.targetMarkerImage32,
+        }),
     });
-    return features;
+
+    let items = lonLatArray.length;
+    //adding one more item to the list (the highlighted marker)
+    if(targetLonLat !== null && targetLonLat !== undefined) {
+        items += 1;
+    }
+
+    let iconFeatures = [items];
+
+    for(let i = 0; i < lonLatArray.length; i++) {
+        iconFeatures[i] = new Feature({
+            geometry: new Point(fromLonLat(lonLatArray[i])),
+        });
+        iconFeatures[i].setStyle(iconStyle);
+    }
+    if(targetLonLat !== null && targetLonLat !== undefined){
+        iconFeatures[iconFeatures.length-1] = new Feature({
+            geometry: new Point(fromLonLat(targetLonLat)),
+        });
+        iconFeatures[iconFeatures.length-1].setStyle(iconTargetStyle);
+    }
+
+    return iconFeatures;
 }
 
 function App() {
@@ -48,9 +71,8 @@ function App() {
     const [zoom, setZoom] = React.useState(9);
 
     const [showMarker, setShowMarker] = React.useState(false);
-    const [addressMarkers, setAddressMarkers] = React.useState([]);
 
-    const [features, setFeatures] = React.useState(addMarkers(markersLonLat));
+    const [features, setFeatures] = React.useState(addMarkers(markersLonLat, null));
 
     const [addresses, setAddresses] = React.useState([]);
 
@@ -60,10 +82,30 @@ function App() {
 
     const refreshAddresses = fetchAddressData;
 
+    //gets executed when the app starts
     useEffect(() => {
         fetchUsersData();
         fetchAddressData();
     }, [])
+
+    function placeMarkers(highlightedAddress) {
+
+        let points = [];
+        let targetPoint = null;
+        let targetFound = false;
+        for(let i = 0; i < addresses.data.length; i++) {
+
+            if(highlightedAddress.lon === addresses.data[i].lon && highlightedAddress.lat === addresses.data[i].lat){
+                targetPoint = [parseFloat(addresses.data[i].lon), parseFloat(addresses.data[i].lat)];
+                targetFound = true;
+            } else {
+                points[targetFound ? i-1 : i] = [parseFloat(addresses.data[i].lon), parseFloat(addresses.data[i].lat)];
+            }
+        }
+
+        setCenter(targetPoint);
+        setFeatures(addMarkers(points, targetPoint));
+    }
 
     function fetchAddressData(showAll){
 
@@ -92,7 +134,7 @@ function App() {
     const chooseVisibility =
         <div className="btn-group btn-group-toggle" data-toggle="buttons" id="visibility">
             <label className="btn btn-primary">
-                <input onChange={() => { setShowForeignAddresses(true); fetchAddressData(1);}} value="true" type="radio" name="options" autoComplete="off" defaultChecked={true}/> Öffentliche Adressen
+                <input onChange={() => { setShowForeignAddresses(true); fetchAddressData(1);}} value="true" type="radio" name="options" autoComplete="off" defaultChecked={true} /> Öffentliche Adressen
             </label>
             <label className="btn btn-secondary active">
                 <input onChange={() => { setShowForeignAddresses(false); fetchAddressData(0);}} value="false" type="radio" name="options" autoComplete="off"/> Nur private Adressen
@@ -102,14 +144,25 @@ function App() {
     const listItems = addresses.data===undefined ? <a/> : addresses.data.map((address) =>
         <div className="row">
             <Link to={"/edit-address"}>
-            <a onClick={() => setSelectedAddress(address)} className="list-group-item list-group-item-action list-group-item-dark">{address.firstName} {address.lastName}
+            <a onClick={() => setSelectedAddress(address)} onMouseOver={() => {placeMarkers(address); setShowMarker(true);}} onMouseEnter={() => setShowMarker(false)} className="list-group-item list-group-item-action list-group-item-dark">{address.firstName} {address.lastName}
             </a>
             </Link>
-            <input
-                type="checkbox"
-            />
         </div>
     );
+
+    const map =
+        <div className="col-6">
+            <Map center={fromLonLat(center)} zoom={zoom} user={user}>
+                <Layers>
+                    <TileLayer source={osm()} zIndex={0}/>
+                    {showMarker && <VectorLayer source={vector({features})}/>}
+                    {/*<VectorLayer source={vector({features})}/>*/}
+                </Layers>
+                <Controls>
+                    <FullScreenControl/>
+                </Controls>
+            </Map>
+        </div>
 
     return (
         <div>
@@ -175,25 +228,7 @@ function App() {
                                     {chooseVisibility}
                                     {listItems}
                                 </div>
-                                <div className="col-6">
-                                    <Map center={fromLonLat(center)} zoom={zoom} {...props} user={user}>
-                                        <Layers>
-                                            <TileLayer source={osm()} zIndex={0}/>
-                                            {showMarker && <VectorLayer source={vector({features})}/>}
-                                        </Layers>
-                                        <Controls>
-                                            <FullScreenControl/>
-                                        </Controls>
-                                    </Map>
-                                </div>
-                                <div>
-                                    <input
-                                        type="checkbox"
-                                        defaultChecked={showMarker}
-                                        onChange={(event) => setShowMarker(event.target.checked)}
-                                    />{" "}
-                                    Show markers
-                                </div>
+                                {map}
                             </div>
                         )}
                     />
