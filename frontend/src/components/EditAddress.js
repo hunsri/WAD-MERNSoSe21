@@ -97,6 +97,14 @@ const EditAddress = props => {
             </select>
         )
 
+    function isUserAdmin(){
+        if(loggedInUser.name==="admina" || loggedInUser.name===addressData.ownerId){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     function validateInput(){
         'use strict' //strict mode to make sure every variable is declared
 
@@ -132,33 +140,33 @@ const EditAddress = props => {
             <br/>
             <div className="btn-group btn-group-toggle" data-toggle="buttons" id="visibility">
                 <label className="btn btn-primary">
-                    <input onChange={handleInputChange} value="true" type="radio" name="options" id="public" autoComplete="off" name="isPrivate"/> Öffentlich
+                    <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} value="true" type="radio" name="options" id="public" autoComplete="off" defaultChecked={addressData.isPrivate==="false" ? true : false} name="isPrivate"/> Öffentlich
                 </label>
                 <label className="btn btn-secondary active">
-                    <input onChange={handleInputChange} value="false" type="radio" name="options" id="private" autoComplete="off" defaultChecked={true} name="isPrivate"/> Privat
+                    <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} value="false" type="radio" name="options" id="private" autoComplete="off" defaultChecked={addressData.isPrivate==="true" ? true : false} name="isPrivate"/> Privat
                 </label>
             </div>
             <br/>
             <br/>
             <label htmlFor="title" className="form-label">Titel</label>
-            <input onChange={handleInputChange} value={addressData.title} className="form-control" type="text" placeholder="Dr." id="title" name="title"/>
+            <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} value={addressData.title} className="form-control" type="text" placeholder="Dr." id="title" name="title"/>
             <br/>
             <label htmlFor="gender" className="form-label">Geschlecht</label>
             <br/>
             <div className="form-check form-check-inline" id="gender">
-                <input onChange={handleInputChange} className="form-check-input" type="radio" name="inlineRadioOptions" id="male" value="m" name="gender"/>
+                <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} className="form-check-input" type="radio" name="inlineRadioOptions" id="male" value="m" defaultChecked={addressData.gender==="m" ? true : false} name="gender"/>
                 <label className="form-check-label" htmlFor="male">männlich</label>
             </div>
             <div className="form-check form-check-inline">
-                <input onChange={handleInputChange} className="form-check-input" type="radio" name="inlineRadioOptions" id="female" value="f" name="gender"/>
+                <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} className="form-check-input" type="radio" name="inlineRadioOptions" id="female" value="f" defaultChecked={addressData.gender==="f" ? true : false} name="gender"/>
                 <label className="form-check-label" htmlFor="female">weiblich</label>
             </div>
             <div className="form-check form-check-inline">
-                <input onChange={handleInputChange} className="form-check-input" type="radio" name="inlineRadioOptions" id="diverse" value="d" name="gender"/>
+                <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} className="form-check-input" type="radio" name="inlineRadioOptions" id="diverse" defaultChecked={addressData.gender==="d" ? true : false} value="d" name="gender"/>
                 <label className="form-check-label" htmlFor="diverse">divers</label>
             </div>
             <div className="form-check form-check-inline">
-                <input onChange={handleInputChange} className="form-check-input" type="radio" name="inlineRadioOptions" id="no-gender-provided" value="" name="gender"/>
+                <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} className="form-check-input" type="radio" name="inlineRadioOptions" id="no-gender-provided" defaultChecked={addressData.gender==="" ? true : false} value="" name="gender"/>
                 <label className="form-check-label" htmlFor="diverse">keine Angabe</label>
             </div>
             <br/>
@@ -166,22 +174,22 @@ const EditAddress = props => {
             {/*validation required here*/}
             <form className="needs-validation" noValidate>
                 <label htmlFor="forename" className="form-label">Vorname*</label>
-                <input onChange={handleInputChange} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.firstName} class="form-control" type="text" placeholder="Tim" id="forename" name="firstName" required/>
+                <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.firstName} class="form-control" type="text" placeholder="Tim" id="forename" name="firstName" required/>
                 <div className="invalid-feedback">Bitte überprüfe deine Eingabe und achte auf Groß- und Kleinschreibung!</div>
                 <br/>
                 <label htmlFor="surname" className="form-label">Nachname*</label>
-                <input onChange={handleInputChange} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.lastName} className="form-control" type="text" placeholder="Berners-Lee" id="surname" name="lastName" required/>
+                <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.lastName} className="form-control" type="text" placeholder="Berners-Lee" id="surname" name="lastName" required/>
                 <div className="invalid-feedback">Bitte überprüfe deine Eingabe und achte auf Groß- und Kleinschreibung!</div>
                 <br/>
                 <div className="row">
                     <div className="col-10">
                         <label htmlFor="street" className="form-label">Straße*</label>
-                        <input onChange={handleInputChange} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.street} className="form-control" type="text" placeholder="Via Regia" id="street" name="street" required/>
+                        <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.street} className="form-control" type="text" placeholder="Via Regia" id="street" name="street" required/>
                         <div className="invalid-feedback">Bitte überprüfe deine Eingabe und achte auf Groß- und Kleinschreibung!</div>
                     </div>
                     <div className="col-2">
                         <label htmlFor="number" className="form-label">Hausnummer*</label>
-                        <input onChange={handleInputChange} pattern="^[1-9]\d{0,5} ?[a-zA-Z]?" value={addressData.houseNumber} className="form-control" type="text" placeholder="113" id="number" name="houseNumber" required/>
+                        <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} pattern="^[1-9]\d{0,5} ?[a-zA-Z]?" value={addressData.houseNumber} className="form-control" type="text" placeholder="113" id="number" name="houseNumber" required/>
                         <div className="invalid-feedback">Bitte überprüfe deine Eingabe!</div>
                     </div>
                 </div>
@@ -189,36 +197,36 @@ const EditAddress = props => {
                 <div className="row">
                     <div className="col-2">
                         <label htmlFor="zipcode" className="form-label">PLZ*</label>
-                        <input onChange={handleInputChange} pattern="[0-9]+$" value={addressData.postcode} className="form-control" type="text" placeholder="27367" id="zipcode" name="postcode" required/>
+                        <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} pattern="[0-9]+$" value={addressData.postcode} className="form-control" type="text" placeholder="27367" id="zipcode" name="postcode" required/>
                         <div className="invalid-feedback">Bitte überprüfe deine Eingabe!</div>
                     </div>
                     <div className="col-10">
                         <label htmlFor="city" className="form-label">Stadt*</label>
-                        <input onChange={handleInputChange} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.town} className="form-control" type="text" placeholder="Stuckenborstel" id="city" name="town" required/>
+                        <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.town} className="form-control" type="text" placeholder="Stuckenborstel" id="city" name="town" required/>
                         <div className="invalid-feedback">Bitte überprüfe deine Eingabe und achte auf Groß- und Kleinschreibung</div>
                     </div>
                 </div>
                 <br/>
                 <label htmlFor="state" className="form-label">Bundesland*</label>
-                <input onChange={handleInputChange} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.federalState} className="form-control" type="text" placeholder="Niedersachsen" id="state" name="federalState" required/>
+                <input onChange={handleInputChange} disabled={!isUserAdmin() ? true : false} pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" value={addressData.federalState} className="form-control" type="text" placeholder="Niedersachsen" id="state" name="federalState" required/>
                 <div className="invalid-feedback">Bitte überprüfe deine Eingabe und achte auf Groß- und Kleinschreibung</div>
                 <br/>
                 <label htmlFor="country" pattern="^[\u00c0-\u00deA-Z'\-][ \u00c0-\u01ffa-zA-Z'\-]+$" className="form-label">Land*</label>
-                <input onChange={handleInputChange} value={addressData.country} className="form-control" type="text" placeholder="Deutschland" id="country" name="country" required/>
+                <input onChange={handleInputChange} value={addressData.country} disabled={!isUserAdmin() ? true : false} className="form-control" type="text" placeholder="Deutschland" id="country" name="country" required/>
                 <div className="invalid-feedback">Bitte überprüfe deine Eingabe und achte auf Groß- und Kleinschreibung</div>
                 <br/>
             </form>
             <label htmlFor="email" className="form-label">E-Mail</label>
-            <input onChange={handleInputChange} value={addressData.email} className="form-control" type="text" placeholder="info@example.com" name="email" id="email"/>
+            <input onChange={handleInputChange} value={addressData.email} disabled={!isUserAdmin() ? true : false} className="form-control" type="text" placeholder="info@example.com" name="email" id="email"/>
             <br/>
             <label htmlFor="misc" className="form-label">Sonstiges</label>
-            <input onChange={handleInputChange} value={addressData.further} className="form-control" type="text" id="further" name="further"/>
+            <input onChange={handleInputChange} value={addressData.further} disabled={!isUserAdmin() ? true : false} className="form-control" type="text" id="further" name="further"/>
             <br/>
             {invalidAddressWarning}
-            <button onClick={() => {attemptChanging().then(); } } className="btn btn-primary btn-lg" type="submit">Veränderung senden</button>
+            <button onClick={ () => {attemptChanging().then(); } } disabled={!isUserAdmin() ? true : false} className="btn btn-primary btn-lg" type="submit">Veränderung senden</button>
             <button onClick={ () => history.goBack() } className="btn btn-secondary btn-lg m-2">Abbrechen</button>
             <br/>
-            <button onClick={ () => {attemptDeletion(); history.goBack()} } type="button" className="btn btn-danger">Addresse löschen</button>
+            <button onClick={ () => {attemptDeletion(); history.goBack()} } disabled={!isUserAdmin() ? true : false} type="button" className="btn btn-danger">Addresse löschen</button>
         </div>
     );
 };

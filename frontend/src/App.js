@@ -39,13 +39,7 @@ function addMarkers(lonLatArray, targetLonLat) {
         }),
     });
 
-    let items = lonLatArray.length;
-    //adding one more item to the list (the highlighted marker)
-    if(targetLonLat !== null && targetLonLat !== undefined) {
-        items += 1;
-    }
-
-    let iconFeatures = [items];
+    let iconFeatures = [];
 
     for(let i = 0; i < lonLatArray.length; i++) {
         iconFeatures[i] = new Feature({
@@ -54,10 +48,10 @@ function addMarkers(lonLatArray, targetLonLat) {
         iconFeatures[i].setStyle(iconStyle);
     }
     if(targetLonLat !== null && targetLonLat !== undefined){
-        iconFeatures[iconFeatures.length-1] = new Feature({
+        iconFeatures[lonLatArray.length] = new Feature({
             geometry: new Point(fromLonLat(targetLonLat)),
         });
-        iconFeatures[iconFeatures.length-1].setStyle(iconTargetStyle);
+        iconFeatures[lonLatArray.length].setStyle(iconTargetStyle);
     }
 
     return iconFeatures;
@@ -85,7 +79,7 @@ function App() {
     //gets executed when the app starts
     useEffect(() => {
         fetchUsersData();
-        fetchAddressData();
+        fetchAddressData().then();
     }, [])
 
     function placeMarkers(highlightedAddress) {
@@ -93,28 +87,44 @@ function App() {
         let points = [];
         let targetPoint = null;
         let targetFound = false;
-        for(let i = 0; i < addresses.data.length; i++) {
+        if(highlightedAddress !== null) {
+            for (let i = 0; i < addresses.data.length; i++) {
 
-            if(highlightedAddress.lon === addresses.data[i].lon && highlightedAddress.lat === addresses.data[i].lat){
-                targetPoint = [parseFloat(addresses.data[i].lon), parseFloat(addresses.data[i].lat)];
-                targetFound = true;
-            } else {
-                points[targetFound ? i-1 : i] = [parseFloat(addresses.data[i].lon), parseFloat(addresses.data[i].lat)];
+                if (highlightedAddress.lon === addresses.data[i].lon && highlightedAddress.lat === addresses.data[i].lat && highlightedAddress.firstName === addresses.data[i].firstName) {
+                    targetPoint = [parseFloat(addresses.data[i].lon), parseFloat(addresses.data[i].lat)];
+                    targetFound = true;
+                } else {
+                    points[targetFound ? i - 1 : i] = [parseFloat(addresses.data[i].lon), parseFloat(addresses.data[i].lat)];
+                }
+
+                setCenter(targetPoint);
             }
-        }
-
-        setCenter(targetPoint);
-        setFeatures(addMarkers(points, targetPoint));
-    }
-
-    function fetchAddressData(showAll){
-
-        if(user !== null) {
-            //requesting the address data from the backend
-            DataService.fetchAddresses(user, showAll).then(res => {
-                setAddresses(res)
+        } else {
+            let i = 0;
+            addresses.data.map(address => {
+               points[i++] = [parseFloat(address.lon), parseFloat(address.lat)];
             });
         }
+
+        setFeatures(addMarkers(points, targetPoint));
+        setShowMarker(true);
+    }
+
+    async function fetchAddressData(showAll){
+
+        let promise = await new Promise( function (resolve, reject) {
+
+            if (user !== null) {
+                //requesting the address data from the backend
+                DataService.fetchAddresses(user, showAll).then(res => {
+                    setAddresses(res);
+                }).then(() => resolve());
+            } else {
+                reject();
+            }
+        })
+
+        return promise;
     }
 
     function fetchUsersData(){
@@ -131,21 +141,22 @@ function App() {
         setUser(null);
     }
 
+
     const chooseVisibility =
         <div className="btn-group btn-group-toggle" data-toggle="buttons" id="visibility">
-            <label className="btn btn-primary">
-                <input onChange={() => { setShowForeignAddresses(true); fetchAddressData(1);}} value="true" type="radio" name="options" autoComplete="off" defaultChecked={true} /> Öffentliche Adressen
+            <label className="btn btn-primary" onMouseEnter={() => setShowMarker(false)}>
+                <input onChange={() => { setShowForeignAddresses(true); fetchAddressData(1).then();}} value="true" type="radio" name="options" autoComplete="off"/> Öffentliche Adressen
             </label>
-            <label className="btn btn-secondary active">
-                <input onChange={() => { setShowForeignAddresses(false); fetchAddressData(0);}} value="false" type="radio" name="options" autoComplete="off"/> Nur private Adressen
+            <label className="btn btn-secondary active" onMouseEnter={() => setShowMarker(false)}>
+                <input onChange={() => { setShowForeignAddresses(false); fetchAddressData(0).then();}} value="false" type="radio" name="options" autoComplete="off"/> Nur eigene Adressen
             </label>
         </div>
 
     const listItems = addresses.data===undefined ? <a/> : addresses.data.map((address) =>
         <div className="row">
             <Link to={"/edit-address"}>
-            <a onClick={() => setSelectedAddress(address)} onMouseOver={() => {placeMarkers(address); setShowMarker(true);}} onMouseEnter={() => setShowMarker(false)} className="list-group-item list-group-item-action list-group-item-dark">{address.firstName} {address.lastName}
-            </a>
+                <a onClick={() => setSelectedAddress(address)} onMouseOver={() => {placeMarkers(address);}} onMouseEnter={() => setShowMarker(false)} className="list-group-item list-group-item-action list-group-item-dark">{address.firstName} {address.lastName}
+                </a>
             </Link>
         </div>
     );
